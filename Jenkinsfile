@@ -18,15 +18,20 @@ pipeline {
     }
     // This is build section
     stages {
-        stage('ReadVersion') {
-            steps {
-                script{
-                        def packageJSON = readJSON file: 'package.json'
-                        appVersion = package.JSON.version
-                        echo "app version: ${appVersion}"
-                }
+       stage('ReadVersion') {
+        steps {
+            script {
+            // Read package.json into a variable
+                def packageJSON = readJSON file: 'package.json'
+            
+            // Store version in environment variable
+                env.appVersion = packageJSON.version
+            
+            // Print version
+                echo "App version: ${env.appVersion}"
             }
         }
+    }
         stage('Install Dependencies') {
             steps {
                 script{
@@ -42,9 +47,9 @@ pipeline {
                     withAWS(region:'us-east-1',credentials:'aws-creds'){
                         sh """
                             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com
-                            docker build ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
+                            docker build -t ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${env.appVersion} .
                             docker  images
-                            docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
+                            docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${env.appVersion}
                         """
                     }
                 }
