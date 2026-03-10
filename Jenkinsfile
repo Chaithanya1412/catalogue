@@ -16,16 +16,6 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
-    // This is build section
-        stage('Install Dependencies') {
-            steps {
-                script{
-                    sh """
-                        npm install
-                    """
-                }
-            }
-        }
         stage('ReadVersion') {
     steps {
         script {
