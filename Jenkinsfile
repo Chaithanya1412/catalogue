@@ -50,6 +50,18 @@ pipeline {
                 }
             }
         }
+        stage('Sonar Scan'){
+            environment{
+                def scannerHome =tppl 'sonar-8.0'
+            }
+            steps {
+                script{
+                    withSonarQubeEnv('sonar-server'){
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
         stage('Build Image') {
             steps {
                 script{
